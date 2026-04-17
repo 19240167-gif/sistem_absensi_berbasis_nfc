@@ -10,10 +10,23 @@ class EditAttendance extends EditRecord
 {
     protected static string $resource = AttendanceResource::class;
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        $user = auth()->user();
+
+        if ($user?->isGuru()) {
+            $data['approved_by_user_id'] = $user->id;
+            $data['approved_at'] = now();
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->visible(fn (): bool => auth()->user()?->isAdminTu() ?? false),
         ];
     }
 }

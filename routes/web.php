@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AttendanceReportExportController;
+use App\Livewire\KioskMode;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,6 +15,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::redirect('/', '/admin');
+
+Route::middleware(['auth', 'role:admin_tu,guru'])->group(function () {
+    Route::get('/kiosk-mode', KioskMode::class)->name('kiosk.mode');
+});
+
+Route::middleware(['auth', 'role:admin_tu'])->group(function () {
+    Route::get('/reports/attendances/export', AttendanceReportExportController::class)
+        ->name('reports.attendances.export');
 });

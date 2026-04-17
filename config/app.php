@@ -56,6 +56,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'nfc_device_key' => env('NFC_DEVICE_KEY'),
+
     'asset_url' => env('ASSET_URL', '/'),
 
     /*

@@ -2,6 +2,8 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Student\Widgets\StudentAttendanceHistory;
+use App\Filament\Student\Widgets\StudentAttendanceStats;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -25,6 +27,8 @@ class StudentPanelProvider extends PanelProvider
         return $panel
             ->id('student')
             ->path('student')
+            ->login()
+            ->brandName('Dashboard Siswa')
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -35,8 +39,9 @@ class StudentPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Student/Widgets'), for: 'App\\Filament\\Student\\Widgets')
             ->widgets([
+                StudentAttendanceStats::class,
+                StudentAttendanceHistory::class,
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
