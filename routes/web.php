@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceReportExportController;
+use App\Http\Controllers\Auth\DemoLoginController;
 use App\Livewire\KioskMode;
 use Illuminate\Support\Facades\Route;
 
@@ -15,7 +16,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::redirect('/', '/admin');
+Route::get('/demo-login', [DemoLoginController::class, 'index'])->name('demo.login');
+Route::post('/demo-login/{user}', [DemoLoginController::class, 'login'])->name('demo.login.post');
+
+Route::get('/', function () {
+    if (app()->environment('local') || env('DEMO_AUTH')) {
+        if (!auth()->check()) {
+            return redirect()->route('demo.login');
+        }
+    }
+
+    return redirect('/admin');
+});
 
 Route::middleware(['auth', 'role:admin_tu,guru'])->group(function () {
     Route::get('/kiosk-mode', KioskMode::class)->name('kiosk.mode');

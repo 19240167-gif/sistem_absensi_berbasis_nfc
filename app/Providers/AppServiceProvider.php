@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\DemoLogoutResponse;
+use Filament\Http\Responses\Auth\LogoutResponse as FilamentLogoutResponse;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,6 +21,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        $this->app->bind(FilamentLogoutResponse::class, DemoLogoutResponse::class);
     }
 }
