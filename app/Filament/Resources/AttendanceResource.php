@@ -23,7 +23,23 @@ class AttendanceResource extends Resource
 
     protected static ?string $navigationGroup = 'Absensi NFC';
 
+    protected static ?string $navigationLabel = 'Data Absensi';
+
+    protected static ?string $modelLabel = 'Absensi';
+
+    protected static ?string $pluralModelLabel = 'Data Absensi';
+
     protected static ?int $navigationSort = 2;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Attendance::whereDate('attendance_date', today())->count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'success';
+    }
 
     public static function form(Form $form): Form
     {

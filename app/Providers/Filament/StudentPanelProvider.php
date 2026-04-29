@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Student\Widgets\StudentAttendanceChart;
 use App\Filament\Student\Widgets\StudentAttendanceHistory;
 use App\Filament\Student\Widgets\StudentAttendanceStats;
 use Filament\Http\Middleware\Authenticate;
@@ -28,10 +29,15 @@ class StudentPanelProvider extends PanelProvider
             ->id('student')
             ->path('student')
             ->login()
-            ->brandName('Dashboard Siswa')
+            ->brandName('Portal Siswa — Absensi NFC')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Teal,
+                'danger' => Color::Rose,
+                'info' => Color::Sky,
+                'success' => Color::Emerald,
+                'warning' => Color::Amber,
             ])
+            ->font('Inter')
             ->discoverResources(in: app_path('Filament/Student/Resources'), for: 'App\\Filament\\Student\\Resources')
             ->discoverPages(in: app_path('Filament/Student/Pages'), for: 'App\\Filament\\Student\\Pages')
             ->pages([
@@ -40,6 +46,7 @@ class StudentPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Student/Widgets'), for: 'App\\Filament\\Student\\Widgets')
             ->widgets([
                 StudentAttendanceStats::class,
+                StudentAttendanceChart::class,
                 StudentAttendanceHistory::class,
                 Widgets\AccountWidget::class,
             ])

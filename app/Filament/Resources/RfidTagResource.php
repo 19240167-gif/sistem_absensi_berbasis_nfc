@@ -23,7 +23,18 @@ class RfidTagResource extends Resource
 
     protected static ?string $navigationGroup = 'Absensi NFC';
 
+    protected static ?string $navigationLabel = 'Kartu / Tag NFC';
+
+    protected static ?string $modelLabel = 'Tag NFC';
+
+    protected static ?string $pluralModelLabel = 'Kartu / Tag NFC';
+
     protected static ?int $navigationSort = 1;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) RfidTag::where('is_active', true)->count();
+    }
 
     public static function form(Form $form): Form
     {

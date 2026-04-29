@@ -21,6 +21,12 @@ class ClassroomResource extends Resource
 
     protected static ?string $navigationGroup = 'Data Master Sekolah';
 
+    protected static ?string $navigationLabel = 'Rombongan Belajar';
+
+    protected static ?string $modelLabel = 'Rombel';
+
+    protected static ?string $pluralModelLabel = 'Rombongan Belajar';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form

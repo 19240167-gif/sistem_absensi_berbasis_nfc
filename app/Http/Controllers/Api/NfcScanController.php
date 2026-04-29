@@ -71,14 +71,22 @@ class NfcScanController extends Controller
         $student = $tag->user;
         $photoPath = $student->studentProfile?->photo_path ?? $student->profile_photo_path;
 
-        Cache::put('kiosk.latest_scan', [
+        $scanEntry = [
             'student_name' => $student->name,
             'classroom' => $student->studentProfile?->classroom?->name,
             'photo_url' => $photoPath ? Storage::disk('public')->url($photoPath) : null,
             'status' => $attendance->status,
             'check_in_at' => optional($attendance->check_in_at)->format('H:i:s'),
             'scanned_at' => $scannedAt->toDateTimeString(),
-        ], now()->addMinutes(5));
+        ];
+
+        Cache::put('kiosk.latest_scan', $scanEntry, now()->addMinutes(5));
+
+        // Push to recent scans list (max 10, LIFO) for kiosk timeline
+        $recentScans = Cache::get('kiosk.recent_scans', []);
+        array_unshift($recentScans, $scanEntry);
+        $recentScans = array_slice($recentScans, 0, 10);
+        Cache::put('kiosk.recent_scans', $recentScans, now()->addMinutes(30));
 
         return response()->json([
             'message' => 'NFC tap processed successfully.',

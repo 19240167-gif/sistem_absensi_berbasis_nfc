@@ -23,6 +23,12 @@ class StudentProfileResource extends Resource
 
     protected static ?string $navigationGroup = 'Data Master Sekolah';
 
+    protected static ?string $navigationLabel = 'Profil Siswa';
+
+    protected static ?string $modelLabel = 'Profil Siswa';
+
+    protected static ?string $pluralModelLabel = 'Profil Siswa';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form

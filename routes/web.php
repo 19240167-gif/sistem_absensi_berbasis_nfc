@@ -20,14 +20,8 @@ Route::get('/demo-login', [DemoLoginController::class, 'index'])->name('demo.log
 Route::post('/demo-login/{user}', [DemoLoginController::class, 'login'])->name('demo.login.post');
 
 Route::get('/', function () {
-    if (app()->environment('local') || env('DEMO_AUTH')) {
-        if (!auth()->check()) {
-            return redirect()->route('demo.login');
-        }
-    }
-
-    return redirect('/admin');
-});
+    return view('welcome');
+})->name('home');
 
 Route::middleware(['auth', 'role:admin_tu,guru'])->group(function () {
     Route::get('/kiosk-mode', KioskMode::class)->name('kiosk.mode');
