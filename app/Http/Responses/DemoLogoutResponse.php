@@ -13,6 +13,10 @@ class DemoLogoutResponse extends LogoutResponse
             return redirect()->route('demo.login');
         }
 
+        if ($request->is('student/*')) {
+            return redirect('/student/login');
+        }
+
         return redirect('/admin/login');
     }
 }

@@ -14,6 +14,13 @@ class CreateAttendance extends CreateRecord
     {
         $data['source'] = $data['source'] ?? 'manual';
 
+        $user = auth()->user();
+
+        if ($user?->isAdminTu() || $user?->isGuru()) {
+            $data['approved_by_user_id'] = $user->id;
+            $data['approved_at'] = now();
+        }
+
         return $data;
     }
 }

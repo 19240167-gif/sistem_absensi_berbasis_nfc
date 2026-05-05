@@ -14,7 +14,6 @@ class Classroom extends Model
     protected $fillable = [
         'name',
         'code',
-        'grade_level',
         'academic_year',
         'homeroom_teacher_user_id',
     ];

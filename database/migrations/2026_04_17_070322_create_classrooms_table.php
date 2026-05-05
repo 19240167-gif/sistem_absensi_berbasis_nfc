@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('code')->unique();
-            $table->string('grade_level', 20);
             $table->string('academic_year', 20);
             $table->foreignId('homeroom_teacher_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

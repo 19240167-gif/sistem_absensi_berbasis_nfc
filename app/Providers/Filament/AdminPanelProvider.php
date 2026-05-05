@@ -44,15 +44,12 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Absensi NFC')
-                    ->icon('heroicon-o-signal')
                     ->collapsed(false),
                 NavigationGroup::make()
                     ->label('Data Master Sekolah')
-                    ->icon('heroicon-o-building-library')
                     ->collapsed(false),
                 NavigationGroup::make()
                     ->label('Manajemen Pengguna')
-                    ->icon('heroicon-o-cog-6-tooth')
                     ->collapsed(true),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

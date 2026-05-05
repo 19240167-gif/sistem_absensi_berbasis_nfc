@@ -21,11 +21,11 @@ class ClassroomResource extends Resource
 
     protected static ?string $navigationGroup = 'Data Master Sekolah';
 
-    protected static ?string $navigationLabel = 'Rombongan Belajar';
+    protected static ?string $navigationLabel = 'Kelas';
 
-    protected static ?string $modelLabel = 'Rombel';
+    protected static ?string $modelLabel = 'Kelas';
 
-    protected static ?string $pluralModelLabel = 'Rombongan Belajar';
+    protected static ?string $pluralModelLabel = 'Kelas';
 
     protected static ?int $navigationSort = 1;
 
@@ -34,23 +34,21 @@ class ClassroomResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
-                    ->label('Nama Rombel')
+                    ->label('Nama Kelas')
                     ->required()
                     ->maxLength(255),
                 TextInput::make('code')
-                    ->label('Kode Rombel')
+                    ->label('Kode Kelas')
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
-                TextInput::make('grade_level')
-                    ->label('Tingkat')
-                    ->required()
-                    ->maxLength(20),
                 TextInput::make('academic_year')
                     ->label('Tahun Ajaran')
                     ->required()
                     ->maxLength(20)
-                    ->placeholder('2026/2027'),
+                    ->placeholder('2026/2027')
+                    ->regex('/^\d{4}\/\d{4}$/')
+                    ->helperText('Format wajib: 2026/2027'),
                 Select::make('homeroom_teacher_user_id')
                     ->label('Wali Kelas')
                     ->relationship(
@@ -68,15 +66,12 @@ class ClassroomResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Rombel')
+                    ->label('Kelas')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('grade_level')
-                    ->label('Tingkat')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('academic_year')
                     ->label('Tahun Ajaran')
                     ->sortable(),

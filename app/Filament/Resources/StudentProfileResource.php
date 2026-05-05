@@ -47,7 +47,7 @@ class StudentProfileResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true),
                 Select::make('classroom_id')
-                    ->label('Rombel')
+                    ->label('Kelas')
                     ->relationship('classroom', 'name')
                     ->searchable()
                     ->preload(),
@@ -86,7 +86,7 @@ class StudentProfileResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('classroom.name')
-                    ->label('Rombel')
+                    ->label('Kelas')
                     ->placeholder('-')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('nisn')
@@ -97,7 +97,7 @@ class StudentProfileResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('classroom_id')
                     ->relationship('classroom', 'name')
-                    ->label('Rombel'),
+                    ->label('Kelas'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -14,7 +14,7 @@ class EditAttendance extends EditRecord
     {
         $user = auth()->user();
 
-        if ($user?->isGuru()) {
+        if ($user?->isGuru() || $user?->isAdminTu()) {
             $data['approved_by_user_id'] = $user->id;
             $data['approved_at'] = now();
         }

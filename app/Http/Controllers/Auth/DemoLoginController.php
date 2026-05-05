@@ -20,7 +20,11 @@ class DemoLoginController extends Controller
             abort(403);
         }
 
-        $users = User::with('role')->orderBy('name')->get();
+        $users = User::with('role')
+            ->where('is_active', true)
+            ->whereHas('role', fn ($query) => $query->whereIn('slug', ['admin_tu', 'guru']))
+            ->orderBy('name')
+            ->get();
 
         return view('auth.demo-login', compact('users'));
     }
@@ -31,7 +35,12 @@ class DemoLoginController extends Controller
             abort(403);
         }
 
+        if (! $user->is_active || ! in_array($user->role?->slug, ['admin_tu', 'guru'], true)) {
+            abort(403);
+        }
+
         Auth::login($user);
+        $request->session()->regenerate();
 
         return redirect()->intended('/admin');
     }
