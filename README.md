@@ -6,6 +6,11 @@ Starter project Laravel + Filament + Livewire untuk absensi sekolah berbasis NFC
 - Guru: monitor absensi kelas wali, validasi/perubahan status absensi.
 - Siswa: lihat riwayat dan statistik kehadiran pribadi.
 
+## Struktur Repo
+
+- Laravel tetap di root (agar routing dan perintah artisan tetap sama)
+- Flutter disiapkan di folder `mobile/`
+
 ## Stack
 
 - Laravel 10
