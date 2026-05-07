@@ -23,11 +23,11 @@ class AttendanceResource extends Resource
 
     protected static ?string $navigationGroup = 'Absensi NFC';
 
-    protected static ?string $navigationLabel = 'Data Absensi';
+    protected static ?string $navigationLabel = 'Data Kelas';
 
     protected static ?string $modelLabel = 'Absensi';
 
-    protected static ?string $pluralModelLabel = 'Data Absensi';
+    protected static ?string $pluralModelLabel = 'Data Kelas';
 
     protected static ?int $navigationSort = 2;
 
@@ -125,6 +125,19 @@ class AttendanceResource extends Resource
                     ->placeholder('-'),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('classroom')
+                    ->label('Kelas')
+                    ->options([
+                        'X TE' => 'X TE',
+                        'XI TEI' => 'XI TEI',
+                        'XII TEI' => 'XII TEI',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query->when(
+                            $data['classroom'] ?? null,
+                            fn (Builder $builder, string $classroom): Builder => $builder->whereHas('student.studentProfile.classroom', fn (Builder $builder) => $builder->where('name', $classroom))
+                        );
+                    }),
                 Tables\Filters\SelectFilter::make('status')
                     ->options(Attendance::STATUS_OPTIONS)
                     ->label('Status'),
