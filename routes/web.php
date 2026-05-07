@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/demo-login', [DemoLoginController::class, 'index'])->name('demo.login');
+Route::get('/demo-login/{user}', fn () => redirect()->route('demo.login'));
 Route::post('/demo-login/{user}', [DemoLoginController::class, 'login'])->name('demo.login.post');
 
 Route::get('/', function () {
