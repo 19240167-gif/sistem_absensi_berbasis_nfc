@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttendanceReportExportController extends Controller
 {
-    public function __invoke(Request $request): StreamedResponse
+    public function __invoke(Request $request)
     {
         $attendances = Attendance::query()
             ->with([
@@ -23,8 +24,27 @@ class AttendanceReportExportController extends Controller
                 $request->filled('end_date'),
                 fn ($query) => $query->whereDate('attendance_date', '<=', $request->date('end_date'))
             )
+            ->when(
+                $request->filled('attendance_date'),
+                fn ($query) => $query->whereDate('attendance_date', $request->date('attendance_date'))
+            )
+            ->when(
+                $request->filled('classroom'),
+                fn ($query, string $classroom) => $query->whereHas('student.studentProfile.classroom', fn ($query) => $query->where('name', $classroom))
+            )
             ->orderByDesc('attendance_date')
             ->get();
+
+        if ($request->input('type') === 'pdf') {
+            $classroom = $request->input('classroom', 'Semua Kelas');
+            $attendanceDate = $request->input('attendance_date', today()->toDateString());
+            $fileName = sprintf('absensi_kelas_%s_%s.pdf', str_replace(' ', '_', strtolower($classroom)), now()->format('Ymd_His'));
+
+            $pdf = Pdf::loadView('reports.attendance_pdf', compact('attendances', 'classroom', 'attendanceDate'))
+                ->setPaper('a4', 'portrait');
+
+            return $pdf->download($fileName);
+        }
 
         $fileName = 'laporan_absensi_'.now()->format('Ymd_His').'.csv';
 
