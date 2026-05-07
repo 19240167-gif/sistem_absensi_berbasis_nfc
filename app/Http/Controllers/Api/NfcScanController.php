@@ -18,7 +18,7 @@ class NfcScanController extends Controller
     {
         $deviceKey = config('app.nfc_device_key');
 
-        if ($deviceKey && $request->header('X-Device-Key') !== $deviceKey) {
+        if (! $deviceKey || $request->header('X-Device-Key') !== $deviceKey) {
             return response()->json([
                 'message' => 'Unauthorized device key.',
             ], 401);
@@ -54,12 +54,18 @@ class NfcScanController extends Controller
             ]);
 
             if (! $attendance->exists) {
+                // First tap of the day
                 $attendance->status = 'hadir';
                 $attendance->source = 'nfc';
-            }
+                $attendance->check_in_at = $scannedAt;
+                $attendance->save();
+            } elseif ($attendance->check_in_at && $attendance->check_in_at->diffInSeconds($scannedAt) < 30) {
+                // Double tap within 30 seconds — ignore
+                $tag->update(['last_seen_at' => $scannedAt]);
 
-            $attendance->check_in_at = $scannedAt;
-            $attendance->save();
+                return null;
+            }
+            // If attendance exists but no double-tap, just update last_seen_at
 
             $tag->update([
                 'last_seen_at' => $scannedAt,
@@ -67,6 +73,13 @@ class NfcScanController extends Controller
 
             return $attendance;
         });
+
+        // Handle double-tap early return
+        if ($attendance === null) {
+            return response()->json([
+                'message' => 'Tap diabaikan: terlalu cepat (double tap).',
+            ], 429);
+        }
 
         $student = $tag->user;
         $photoPath = $student->studentProfile?->photo_path ?? $student->profile_photo_path;

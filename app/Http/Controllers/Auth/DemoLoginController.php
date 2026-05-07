@@ -11,7 +11,7 @@ class DemoLoginController extends Controller
 {
     protected function demoEnabled(): bool
     {
-        return app()->environment('local') || env('DEMO_AUTH', false);
+        return app()->environment('local') || config('app.demo_auth', false);
     }
 
     public function index()
@@ -22,7 +22,7 @@ class DemoLoginController extends Controller
 
         $users = User::with('role')
             ->where('is_active', true)
-            ->whereHas('role', fn ($query) => $query->whereIn('slug', ['admin_tu', 'guru']))
+            ->whereHas('role', fn ($query) => $query->whereIn('slug', ['admin_tu', 'guru', 'siswa']))
             ->orderBy('name')
             ->get();
 
@@ -35,12 +35,16 @@ class DemoLoginController extends Controller
             abort(403);
         }
 
-        if (! $user->is_active || ! in_array($user->role?->slug, ['admin_tu', 'guru'], true)) {
+        if (! $user->is_active || ! in_array($user->role?->slug, ['admin_tu', 'guru', 'siswa'], true)) {
             abort(403);
         }
 
         Auth::login($user);
         $request->session()->regenerate();
+
+        if ($user->role?->slug === 'siswa') {
+            return redirect()->intended('/student');
+        }
 
         return redirect()->intended('/admin');
     }

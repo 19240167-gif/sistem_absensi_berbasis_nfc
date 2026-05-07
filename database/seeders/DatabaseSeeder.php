@@ -14,7 +14,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
-            DemoUserSeeder::class,
         ]);
+
+        // Demo users hanya di-seed di local/testing environment
+        if (app()->environment('local', 'testing')) {
+            $this->call([
+                DemoUserSeeder::class,
+            ]);
+        }
     }
 }

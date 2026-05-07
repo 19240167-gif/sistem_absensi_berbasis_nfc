@@ -58,6 +58,8 @@ return [
 
     'nfc_device_key' => env('NFC_DEVICE_KEY'),
 
+    'demo_auth' => env('DEMO_AUTH', false),
+
     'asset_url' => env('ASSET_URL', '/'),
 
     /*
@@ -71,7 +73,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Jakarta',
 
     /*
     |--------------------------------------------------------------------------

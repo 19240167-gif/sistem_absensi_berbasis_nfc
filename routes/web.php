@@ -26,6 +26,10 @@ Route::get('/', function () {
         }
     }
 
+    if (auth()->check() && auth()->user()->isSiswa()) {
+        return redirect('/student');
+    }
+
     return redirect('/admin');
 });
 

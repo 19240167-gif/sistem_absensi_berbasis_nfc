@@ -65,6 +65,7 @@ class DemoUserSeeder extends Seeder
             ['code' => 'X-IPA-1'],
             [
                 'name' => 'X IPA 1',
+                'grade_level' => 'X',
                 'academic_year' => '2026/2027',
                 'homeroom_teacher_user_id' => $guru->id,
             ]
@@ -77,6 +78,7 @@ class DemoUserSeeder extends Seeder
                 'nisn' => '0012345678',
                 'nis' => 'S001',
                 'gender' => 'P',
+                'birth_date' => '2008-03-14',
             ]
         );
 

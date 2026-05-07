@@ -3,17 +3,23 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StudentProfileResource\Pages;
+use App\Models\RfidTag;
+use App\Models\Role;
 use App\Models\StudentProfile;
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class StudentProfileResource extends Resource
 {
@@ -45,7 +51,41 @@ class StudentProfileResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->unique(ignoreRecord: true),
+                    ->unique(ignoreRecord: true)
+                    ->createOptionForm([
+                        TextInput::make('name')
+                            ->label('Nama Siswa')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->maxLength(255)
+                            ->unique(User::class, 'email'),
+                        TextInput::make('password')
+                            ->password()
+                            ->required()
+                            ->minLength(6),
+                    ])
+                    ->createOptionUsing(function (array $data): int {
+                        $roleId = Role::where('slug', 'siswa')->value('id');
+
+                        if (! $roleId) {
+                            throw ValidationException::withMessages([
+                                'user_id' => 'Role siswa belum tersedia. Jalankan seeder role terlebih dahulu.',
+                            ]);
+                        }
+
+                        $user = User::create([
+                            'name' => $data['name'],
+                            'email' => $data['email'],
+                            'password' => Hash::make($data['password']),
+                            'role_id' => $roleId,
+                            'is_active' => true,
+                        ]);
+
+                        return $user->id;
+                    }),
                 Select::make('classroom_id')
                     ->label('Kelas')
                     ->relationship('classroom', 'name')
@@ -55,6 +95,8 @@ class StudentProfileResource extends Resource
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
                 TextInput::make('nis')
+                    ->label('NIS')
+                    ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
                 Select::make('gender')
@@ -64,7 +106,8 @@ class StudentProfileResource extends Resource
                         'P' => 'Perempuan',
                     ]),
                 DatePicker::make('birth_date')
-                    ->label('Tanggal Lahir'),
+                    ->label('Tanggal Lahir')
+                    ->required(),
                 FileUpload::make('photo_path')
                     ->label('Foto Siswa')
                     ->directory('students')
@@ -100,6 +143,54 @@ class StudentProfileResource extends Resource
                     ->label('Kelas'),
             ])
             ->actions([
+                Tables\Actions\Action::make('mappingNfc')
+                    ->label('Mapping NFC')
+                    ->icon('heroicon-o-credit-card')
+                    ->visible(fn (): bool => auth()->user()?->isAdminTu() ?? false)
+                    ->fillForm(function (StudentProfile $record): array {
+                        $tag = $record->user?->rfidTag;
+
+                        return [
+                            'uid' => $tag?->uid,
+                            'is_active' => $tag?->is_active ?? true,
+                        ];
+                    })
+                    ->form([
+                        TextInput::make('uid')
+                            ->label('Identifier NFC (Kartu/HP)')
+                            ->required()
+                            ->maxLength(64)
+                            ->helperText('Isi UID kartu atau token NFC dari aplikasi HP.'),
+                        Toggle::make('is_active')
+                            ->label('Aktif')
+                            ->default(true),
+                    ])
+                    ->action(function (StudentProfile $record, array $data): void {
+                        $user = $record->user;
+
+                        if (! $user) {
+                            throw ValidationException::withMessages([
+                                'uid' => 'Akun siswa belum tersedia untuk mapping NFC.',
+                            ]);
+                        }
+
+                        $existing = RfidTag::where('uid', $data['uid'])->first();
+
+                        if ($existing && $existing->user_id !== $user->id) {
+                            throw ValidationException::withMessages([
+                                'uid' => 'Identifier NFC sudah dipakai oleh siswa lain.',
+                            ]);
+                        }
+
+                        RfidTag::updateOrCreate(
+                            ['user_id' => $user->id],
+                            [
+                                'uid' => $data['uid'],
+                                'is_active' => $data['is_active'] ?? true,
+                                'assigned_at' => now(),
+                            ]
+                        );
+                    }),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([

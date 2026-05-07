@@ -10,7 +10,7 @@ class RedirectToDemoLogin
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ((app()->environment('local') || env('DEMO_AUTH')) && ! $request->user()) {
+        if ((app()->environment('local') || config('app.demo_auth')) && ! $request->user()) {
             if ($request->isMethod('get') && $request->is('admin/login', 'student/login', 'login')) {
                 return redirect()->route('demo.login');
             }

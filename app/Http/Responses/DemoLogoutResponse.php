@@ -9,7 +9,7 @@ class DemoLogoutResponse extends LogoutResponse
 {
     public function toResponse($request): RedirectResponse
     {
-        if (app()->environment('local') || env('DEMO_AUTH')) {
+        if (app()->environment('local') || config('app.demo_auth')) {
             return redirect()->route('demo.login');
         }
 

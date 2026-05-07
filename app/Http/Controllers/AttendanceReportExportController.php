@@ -8,6 +8,22 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttendanceReportExportController extends Controller
 {
+    /**
+     * Sanitize a value to prevent CSV/formula injection in spreadsheet applications.
+     */
+    private function sanitizeCsv(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (preg_match('/^[=+\-@\t\r]/', $value)) {
+            return "'" . $value;
+        }
+
+        return $value;
+    }
+
     public function __invoke(Request $request): StreamedResponse
     {
         $attendances = Attendance::query()
@@ -46,13 +62,13 @@ class AttendanceReportExportController extends Controller
             foreach ($attendances as $attendance) {
                 fputcsv($output, [
                     optional($attendance->attendance_date)->format('Y-m-d'),
-                    $attendance->student?->name,
-                    $attendance->student?->studentProfile?->classroom?->name,
+                    $this->sanitizeCsv($attendance->student?->name),
+                    $this->sanitizeCsv($attendance->student?->studentProfile?->classroom?->name),
                     $attendance->status,
                     optional($attendance->check_in_at)->format('H:i:s'),
                     $attendance->source,
-                    $attendance->approvedBy?->name,
-                    $attendance->note,
+                    $this->sanitizeCsv($attendance->approvedBy?->name),
+                    $this->sanitizeCsv($attendance->note),
                 ]);
             }
 
