@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\StudentProfileResource\Pages;
+use App\Models\Classroom;
 use App\Models\RfidTag;
 use App\Models\Role;
 use App\Models\StudentProfile;
@@ -41,16 +42,10 @@ class StudentProfileResource extends Resource
     {
         return $form
             ->schema([
-                Select::make('user_id')
-                    ->label('Akun Siswa')
-                    ->relationship(
-                        name: 'user',
-                        titleAttribute: 'name',
-                        modifyQueryUsing: fn (Builder $query) => $query->whereHas('role', fn (Builder $q) => $q->where('slug', 'siswa'))
-                    )
-                    ->searchable()
-                    ->preload()
+                TextInput::make('student_name')
+                    ->label('Nama Siswa')
                     ->required()
+<<<<<<< HEAD
                     ->unique(ignoreRecord: true)
                     ->createOptionForm([
                         TextInput::make('name')
@@ -86,11 +81,16 @@ class StudentProfileResource extends Resource
 
                         return $user->id;
                     }),
+=======
+                    ->maxLength(255)
+                    ->dehydrated(false)
+                    ->formatStateUsing(fn ($record) => $record?->user?->name),
+>>>>>>> fa091304 (Merubah di bagian create siswa)
                 Select::make('classroom_id')
                     ->label('Kelas')
-                    ->relationship('classroom', 'name')
+                    ->options(Classroom::query()->orderBy('name')->pluck('name', 'id')->toArray())
                     ->searchable()
-                    ->preload(),
+                    ->required(),
                 TextInput::make('nisn')
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
